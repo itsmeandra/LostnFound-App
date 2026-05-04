@@ -11,6 +11,19 @@ export const supabaseClient: SupabaseClient = createClient(
     },
     auth: {
       persistSession: true,
+      detectSessionInUrl: true,
     },
   }
 );
+
+// import { createClient } from "@supabase/supabase-js";
+
+// const supabaseUrl  = import.meta.env.SUPABASE_URL as string;
+// const supabaseKey  = import.meta.env.SUPABASE_ANON_KEY as string;
+
+// export const supabaseClient = createClient(supabaseUrl, supabaseKey, {
+//   auth: {
+//     persistSession: true,
+//     detectSessionInUrl: true,
+//   },
+// });
