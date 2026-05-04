@@ -1,239 +1,91 @@
 import { AuthProvider } from "@refinedev/core";
 import { supabaseClient } from "./supabase-client";
 
-const authProvider: AuthProvider = {
-  login: async ({ email, password, providerName }) => {
-    // sign in with oauth
-    try {
-      if (providerName) {
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-          provider: providerName,
-        });
-
-        if (error) {
-          return {
-            success: false,
-            error,
-          };
-        }
-
-        if (data?.url) {
-          return {
-            success: true,
-            redirectTo: "/",
-          };
-        }
-      }
-
-      // sign in with email and password
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data?.user) {
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
-    }
-
-    return {
-      success: false,
-      error: {
-        message: "Login failed",
-        name: "Invalid email or password",
-      },
-    };
-  },
-  register: async ({ email, password }) => {
-    try {
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data) {
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
-    }
-
-    return {
-      success: false,
-      error: {
-        message: "Register failed",
-        name: "Invalid email or password",
-      },
-    };
-  },
-  forgotPassword: async ({ email }) => {
-    try {
-      const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
-        email,
-        {
-          redirectTo: `${window.location.origin}/update-password`,
-        }
-      );
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data) {
-        return {
-          success: true,
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
-    }
-
-    return {
-      success: false,
-      error: {
-        message: "Forgot password failed",
-        name: "Invalid email",
-      },
-    };
-  },
-  updatePassword: async ({ password }) => {
-    try {
-      const { data, error } = await supabaseClient.auth.updateUser({
-        password,
-      });
-
-      if (error) {
-        return {
-          success: false,
-          error,
-        };
-      }
-
-      if (data) {
-        return {
-          success: true,
-          redirectTo: "/",
-        };
-      }
-    } catch (error: any) {
-      return {
-        success: false,
-        error,
-      };
-    }
-    return {
-      success: false,
-      error: {
-        message: "Update password failed",
-        name: "Invalid password",
-      },
-    };
-  },
-  logout: async () => {
-    const { error } = await supabaseClient.auth.signOut();
-
+export const authProvider: AuthProvider = {
+  // ── Login ──
+  login: async ({ email, password, }) => {
+    // sign in with email and password
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    });
     if (error) {
       return {
         success: false,
-        error,
+        error: { message: error.message, name: "Login gagal" },
       };
     }
 
-    return {
-      success: true,
-      redirectTo: "/",
-    };
-  },
-  onError: async (error) => {
-    console.error(error);
-    return { error };
-  },
-  check: async () => {
-    try {
-      const { data } = await supabaseClient.auth.getSession();
-      const { session } = data;
-
-      if (!session) {
-        return {
-          authenticated: false,
-          error: {
-            message: "Check failed",
-            name: "Session not found",
-          },
-          logout: true,
-          redirectTo: "/login",
-        };
-      }
-    } catch (error: any) {
+    if (!data.user) {
       return {
-        authenticated: false,
-        error: error || {
-          message: "Check failed",
-          name: "Not authenticated",
+        success: false, error: { message: "User tidak ditemukan", name: "Error" },
+      };
+    }
+
+    // Verifikasi bahwah user = admin
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    // Logout jika bukan admin
+    if (profile?.role !== "admin") {
+      await supabaseClient.auth.signOut();
+      return {
+        success: false,
+        error: {
+          message: "Akses ditolak. Hanya admin yang dapat masuk.",
+          name: "Unauthorized",
         },
-        logout: true,
-        redirectTo: "/login",
       };
     }
+    return { success: true };
+  },
 
+  // ── Logout ──
+  logout: async () => {
+    await supabaseClient.auth.signOut();
+    return { success: true };
+  },
+
+  // ── Cek apakah masih login (dipanggil tiap navigasi) ──
+  check: async () => {
+    const { data } = await supabaseClient.auth.getSession();
+    if (data.session) {
+      return { authenticated: true };
+    }
     return {
-      authenticated: true,
+      authenticated: false,
+      redirectTo: "/login",
     };
   },
-  getPermissions: async () => {
-    const user = await supabaseClient.auth.getUser();
 
-    if (user) {
-      return user.data.user?.role;
-    }
-
-    return null;
-  },
+  // ── Ambil info user yang sedang login ──
   getIdentity: async () => {
-    const { data } = await supabaseClient.auth.getUser();
+    const { data: {user} } = await supabaseClient.auth.getUser();
+    if (!user) return null;
 
-    if (data?.user) {
-      return {
-        ...data.user,
-        name: data.user.email,
-      };
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("full_name, email, role")
+      .eq("id", user.id)
+      .single();
+
+    return {
+      id: user.id,
+      name: profile?.full_name ?? user.email,
+      email: profile?.email ?? user.email,
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${profile?.full_name}`,
+    };
+  },
+
+  // ── Handle error (401 → redirect login) ──
+  onError: async (error) => {
+    if (error?.status === 401 ){
+      return { logout: true };
     }
-
-    return null;
+    return {};
   },
 };
 
