@@ -41,7 +41,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: FadeTransition(
+        opacity: _fade,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
