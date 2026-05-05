@@ -6,6 +6,8 @@ import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/auth/screens/login_screen.dart';
 import 'package:lostnfound/features/auth/screens/register_screen.dart';
 import 'package:lostnfound/features/home/home_screen.dart';
+import 'package:lostnfound/features/profile/profile_screen.dart';
+import 'package:lostnfound/features/track/track_screen.dart';
 import 'package:lostnfound/shared/screens/main_shell.dart';
 import 'package:lostnfound/shared/screens/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -64,10 +66,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
-          GoRoute(
-            path: AppConstants.routeHome,
-            builder: (_, __) => const HomeScreen(),
-          ),
+          GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+          GoRoute(path: '/track', builder: (_, __) => const TrackScreen()),
+          GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
         ],
       ),
     ],
