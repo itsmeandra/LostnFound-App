@@ -11,10 +11,19 @@ class SplashScreen extends ConsumerStatefulWidget {
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _fade;
+
   @override
   void initState() {
     super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..forward();
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
     _checkSession();
   }
 
@@ -23,8 +32,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     if (!mounted) return;
 
     final session = Supabase.instance.client.auth.currentSession;
-    
-    context.go(session != null ? AppConstants.routeHome : AppConstants.routeLogin);
+
+    context.go(
+      session != null ? AppConstants.routeHome : AppConstants.routeLogin,
+    );
   }
 
   @override
@@ -34,28 +45,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 88, height: 88,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.find_in_page_outlined,
-                size: 48,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
+            Image.asset('assets/images/logo.png', width: 88, height: 88),
             const SizedBox(height: 20),
             Text(
-              'Lost & Found',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              'Lost n Found',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
-              'Temukan yang hilang',
+              'Temukan dan Laporkan barang yang hilang',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
