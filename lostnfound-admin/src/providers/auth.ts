@@ -13,6 +13,11 @@ export const authProvider: AuthProvider = {
       return {
         success: false,
         error: { message: error.message, name: "Login gagal" },
+        errorNotification: {
+          message: "Login Gagal",
+          description: "Email atau password yang Anda masukkan salah.",
+          type: "error",
+        },
       };
     }
 
@@ -38,15 +43,26 @@ export const authProvider: AuthProvider = {
           message: "Akses ditolak. Hanya admin yang dapat masuk.",
           name: "Unauthorized",
         },
+        errorNotification: {
+          message: "Akses Ditolak 🛑",
+          description: "Akun Anda tidak memiliki izin untuk mengakses halaman Admin.",
+          type: "warning", // Bisa pakai 'error' atau 'warning'
+        },
       };
     }
-    return { success: true };
+    return {
+      success: true, redirectTo: "/", successNotification: {
+        message: "Login Berhasil",
+        description: "Selamat datang kembali di Dashboard Admin!",
+        type: "success",
+      },
+    };
   },
 
   // ── Logout ──
   logout: async () => {
     await supabaseClient.auth.signOut();
-    return { success: true };
+    return { success: true, redirectTo: '/login' };
   },
 
   // ── Cek apakah masih login (dipanggil tiap navigasi) ──
@@ -63,7 +79,7 @@ export const authProvider: AuthProvider = {
 
   // ── Ambil info user yang sedang login ──
   getIdentity: async () => {
-    const { data: {user} } = await supabaseClient.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return null;
 
     const { data: profile } = await supabaseClient
@@ -82,7 +98,7 @@ export const authProvider: AuthProvider = {
 
   // ── Handle error (401 → redirect login) ──
   onError: async (error) => {
-    if (error?.status === 401 ){
+    if (error?.status === 401) {
       return { logout: true };
     }
     return {};
