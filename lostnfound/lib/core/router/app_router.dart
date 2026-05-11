@@ -7,6 +7,7 @@ import 'package:lostnfound/features/auth/screens/login_screen.dart';
 import 'package:lostnfound/features/auth/screens/register_screen.dart';
 import 'package:lostnfound/features/home/home_screen.dart';
 import 'package:lostnfound/features/profile/profile_screen.dart';
+import 'package:lostnfound/features/report/screens/report_form_screen.dart';
 import 'package:lostnfound/features/track/track_screen.dart';
 import 'package:lostnfound/shared/screens/main_shell.dart';
 import 'package:lostnfound/shared/screens/splash_screen.dart';
@@ -60,6 +61,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppConstants.routeRegister,
         builder: (_, __) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppConstants.routeReport, // '/report'
+        builder: (_, __) => const ReportFormScreen(),
       ),
 
       // ── App Shell ──
