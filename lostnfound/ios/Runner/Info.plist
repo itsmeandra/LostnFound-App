@@ -56,5 +56,11 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Digunakan untuk mengambil foto barang</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Digunakan untuk memilih foto barang dari galeri</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Digunakan untuk menyimpan foto barang</string>
 </dict>
 </plist>
