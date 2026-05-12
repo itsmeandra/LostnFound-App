@@ -4,6 +4,7 @@ import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:lostnfound/core/router/app_router.dart';
 import 'package:lostnfound/core/theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,26 +16,13 @@ void main() async {
     realtimeClientOptions: const RealtimeClientOptions(eventsPerSecond: 2),
   );
 
+  await initializeDateFormatting('id_ID', null);
+
   // runApp(const MyApp());
   runApp(const ProviderScope(child: LostFoundApp()));
 }
 
 final supabase = Supabase.instance.client;
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Demo',
-//       theme: ThemeData(
-//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-//       ),
-//       home: const MyHomePage(title: 'Flutter Demo Home Page'),
-//     );
-//   }
-// }
 
 class LostFoundApp extends ConsumerWidget {
   const LostFoundApp({super.key});
