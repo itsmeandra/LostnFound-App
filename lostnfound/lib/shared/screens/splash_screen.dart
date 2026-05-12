@@ -43,27 +43,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     return Scaffold(
       body: FadeTransition(
         opacity: _fade,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/logo.png', width: 88, height: 88),
-            const SizedBox(height: 20),
-            Text(
-              'Lost n Found',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Temukan dan Laporkan barang yang hilang',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/logo.png', width: 88, height: 88),
+              const SizedBox(height: 20),
+              Text(
+                'Lost n Found',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
-            const CircularProgressIndicator(),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                'Temukan dan Laporkan barang yang hilang',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 48),
+              const CircularProgressIndicator(),
+            ],
+          ),
         ),
       ),
     );
