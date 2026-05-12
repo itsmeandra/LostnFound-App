@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../core/constants/app_constants.dart';
+import 'package:lostnfound/core/constants/app_constants.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -64,9 +63,9 @@ class MainShell extends StatelessWidget {
         // FAB "Lapor Hilang" hanya muncul di tab Beranda (index 0)
         floatingActionButton: currentIndex == 0
             ? FloatingActionButton.extended(
-                onPressed: () => context.push('/report'),
+                onPressed: () => context.push(AppConstants.routeReport),
                 icon: const Icon(Icons.add),
-                label: const Text('Lapor Kehilang'),
+                label: const Text('Lapor Kehilangan'),
               )
             : null,
       ),
