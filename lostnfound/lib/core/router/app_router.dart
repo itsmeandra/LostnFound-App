@@ -6,7 +6,9 @@ import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/auth/screens/login_screen.dart';
 import 'package:lostnfound/features/auth/screens/register_screen.dart';
 import 'package:lostnfound/features/home/home_screen.dart';
+import 'package:lostnfound/features/item/screens/item_detail_screen.dart';
 import 'package:lostnfound/features/profile/profile_screen.dart';
+import 'package:lostnfound/features/report/screens/my_reports_screen.dart';
 import 'package:lostnfound/features/report/screens/report_form_screen.dart';
 import 'package:lostnfound/features/track/track_screen.dart';
 import 'package:lostnfound/shared/screens/main_shell.dart';
@@ -66,6 +68,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppConstants.routeReport, // '/report'
         builder: (_, __) => const ReportFormScreen(),
       ),
+      GoRoute(
+        path: '/item/:id',
+        builder: (context, state) {
+          // Ambil parameter ID dari URL
+          final itemId = state.pathParameters['id']!;
+          return ItemDetailScreen(itemId: itemId);
+        },
+      ),
+      GoRoute(path: '/my-reports', builder: (_, __) => const MyReportsScreen()),
 
       // ── App Shell ──
       ShellRoute(
