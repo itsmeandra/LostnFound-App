@@ -21,6 +21,7 @@ import { authProvider } from "./providers/auth";
 
 // Pages — dibuat minimal untuk Hari 4
 // Detail implementasi di Minggu 2 & 3
+import { ClaimList, ClaimShow } from "./pages/claims";
 import { ItemList, ItemShow, ItemEdit } from "./pages/items";
 import { LoginPage } from "./pages/auth/login";
 import { DashboardPage } from "./pages/dashboard";
@@ -96,6 +97,10 @@ export default function App() {
                   <Route path="edit/:id" element={<ItemEdit />} />
                 </Route>
                 {/* Route claims & profiles ditambahkan Minggu 2-3 */}
+                <Route path="/claims">
+                  <Route index element={<ClaimList />} />
+                  <Route path="show/:id" element={<ClaimShow />} />
+                </Route>
               </Route>
               <Route path="/login" element={<LoginPage />} />
               <Route path="*" element={<ErrorComponent />} />
