@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -168,8 +169,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: AppBar(
         backgroundColor: _bgColor,
         centerTitle: false,
+        // leadingWidth: 50,  
         iconTheme: IconThemeData(color: _appBarTextColor),
-        // leading: BackButton(onPressed: () => context.pop()),
         title: Text(
           'Registrasi',
           style: TextStyle(
@@ -436,9 +437,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        icon: const Icon(
-                          Icons.g_mobiledata,
-                          size: 28,
+                        icon: SvgPicture.asset(
+                          'assets/icons/google.svg',
+                          width: 26,
+                          height: 26,
                         ), // Ganti dengan asset SVG untuk logo asli
                         label: const Text(
                           'Daftar dengan Google',

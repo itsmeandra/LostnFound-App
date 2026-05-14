@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
@@ -357,7 +358,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        icon: Icon(Icons.g_mobiledata, size: 28),
+                        icon: SvgPicture.asset(
+                          'assets/icons/google.svg',
+                          width: 26,
+                          height: 26,
+                        ),
                         label: Text(
                           'Lanjutkan dengan Google',
                           style: TextStyle(fontSize: 15),
