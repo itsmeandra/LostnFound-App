@@ -9,6 +9,7 @@ class MainShell extends StatelessWidget {
   // Mapping index tab ke route path
   static const List<String> _routes = [
     '/home', // AppConstants.routeHome, // index 0 - Beranda
+    '/laporan', 
     '/track', // index 1 - Lacak (ditambahkan minggu 2)
     '/profile', // AppConstants.routeProfile, // index 2 - Profil
   ];
@@ -49,6 +50,11 @@ class MainShell extends StatelessWidget {
               label: 'Beranda',
             ),
             NavigationDestination(
+              icon: Icon(Icons.add_circle_outline),
+              selectedIcon: Icon(Icons.add_circle_outlined),
+              label: 'Laporan',
+            ),
+            NavigationDestination(
               icon: Icon(Icons.track_changes_outlined),
               selectedIcon: Icon(Icons.track_changes),
               label: 'Lacak',
@@ -62,10 +68,14 @@ class MainShell extends StatelessWidget {
         ),
         // FAB "Lapor Hilang" hanya muncul di tab Beranda (index 0)
         floatingActionButton: currentIndex == 0
-            ? FloatingActionButton.extended(
+            ? FloatingActionButton(
                 onPressed: () => context.push(AppConstants.routeReport),
-                icon: const Icon(Icons.add),
-                label: const Text('Lapor Kehilangan'),
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Icons.add, size: 28),
               )
             : null,
       ),
