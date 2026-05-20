@@ -22,15 +22,16 @@ class PhotoPickerWidget extends ConsumerWidget {
           children: [
             Text(
               'Foto Barang',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w500,
+              style: theme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
             ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -47,11 +48,15 @@ class PhotoPickerWidget extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(
           'Min 1 foto, maks ${AppConstants.maxPhotosPerItem} foto. '
-          'Foto akan dikompres otomatis.',
+          'Format yang didukung: JPG, PNG, WEBP.',
           style: TextStyle(
             fontSize: 12,
             color: theme.colorScheme.onSurfaceVariant,
           ),
+        ),
+        Text(
+          'Foto akan dikompres otomatis.',
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
         ),
         const SizedBox(height: 12),
 
@@ -157,7 +162,9 @@ class _AddPhotoButton extends ConsumerWidget {
         width: 100,
         height: 100,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+          color: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline.withOpacity(0.4),
