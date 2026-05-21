@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:lostnfound/core/router/app_router.dart';
+import 'package:lostnfound/core/services/fcm_service.dart';
 import 'package:lostnfound/core/theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await FCMService.initFirebase();
 
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,
@@ -35,10 +38,8 @@ class LostFoundApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Lost & Found',
       debugShowCheckedModeBanner: false,
-     theme: AppTheme.lightTheme.copyWith(
-        textTheme: GoogleFonts.interTextTheme(
-          AppTheme.lightTheme.textTheme, 
-        ),
+      theme: AppTheme.lightTheme.copyWith(
+        textTheme: GoogleFonts.interTextTheme(AppTheme.lightTheme.textTheme),
       ),
       routerConfig: router,
     );
