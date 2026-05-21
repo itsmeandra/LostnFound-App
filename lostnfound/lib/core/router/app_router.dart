@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
+import 'package:lostnfound/core/services/fcm_service.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/auth/screens/login_screen.dart';
 import 'package:lostnfound/features/auth/screens/register_screen.dart';
 import 'package:lostnfound/features/home/home_screen.dart';
 import 'package:lostnfound/features/item/screens/item_detail_screen.dart';
+import 'package:lostnfound/features/notification/notification_screen.dart';
 import 'package:lostnfound/features/profile/profile_screen.dart';
 import 'package:lostnfound/features/report/screens/my_reports_screen.dart';
 import 'package:lostnfound/features/report/screens/report_form_screen.dart';
@@ -33,16 +35,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == AppConstants.routeLogin ||
           state.matchedLocation == AppConstants.routeRegister;
 
-      // Belum login, mau ke halaman protected → paksa ke /login
-      if (!isLoggedIn && !isAuthPage) return '/login';
-
-      // Sudah login, masih di halaman login/register → ke /home
-      if (isLoggedIn && isAuthPage) return '/home';
-
       // if (isSplash) return null;
 
+      // Belum login, mau ke halaman protected → paksa ke /login
       if (!isLoggedIn && !isAuthPage) return AppConstants.routeLogin;
-
+      
+      // Sudah login, masih di halaman login/register → ke /home
       if (isLoggedIn && isAuthPage) return AppConstants.routeHome;
 
       return null;
@@ -77,12 +75,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/my-reports', builder: (_, __) => const MyReportsScreen()),
+      GoRoute(
+        path: '/notifications',
+        builder: (_, __) => const NotificationScreen(),
+      ),
 
       // ── App Shell ──
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
           GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
+          GoRoute(
+            path: '/laporan',
+            builder: (_, __) => const ReportFormScreen(),
+          ),
           GoRoute(path: '/track', builder: (_, __) => const TrackScreen()),
           GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
         ],
@@ -92,7 +98,32 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 });
 
 class _AuthNotifier extends ChangeNotifier {
-  _AuthNotifier(Ref ref) {
-    ref.listen(authStateProvider, (_, __) => notifyListeners());
+  final Ref _ref;
+  GoRouter? _router;
+
+  _AuthNotifier(Ref ref) : _ref = ref {
+    ref.listen(authStateProvider, (prev, next) {
+      final event = next.value?.event;
+
+      // Saat user login (email, Google, atau session restore)
+      if (event == AuthChangeEvent.signedIn) {
+        _initFCM();
+      }
+      notifyListeners();
+    });
+  }
+
+  // Init FCM dengan callback navigasi
+  Future<void> _initFCM() async {
+    try {
+      await FCMService().initialize(
+        onTap: (route, itemID) {
+          // Navigasi dari notifikasi → pakai router
+          _router?.go(route);
+        },
+      );
+    } catch (e) {
+      debugPrint('Router: FCM ini gagal: $e');
+    }
   }
 }
