@@ -7,6 +7,22 @@
         android:label="lostnfound"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- ... konfigurasi existing ... -->
+        <!-- FCM: default notification channel (Android 8+) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="lostnfound_default" />
+ 
+        <!-- FCM: ikon notifikasi (gunakan ic_notification atau ic_launcher) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+ 
+        <!-- FCM: warna ikon notifikasi (hex tanpa #) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_color" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
