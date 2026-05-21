@@ -85,7 +85,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _errorMessage = null;
     });
     try {
-      await ref.read(authServiceProvider).signInWithGoogle();
+      await ref
+          .read(authServiceProvider)
+          .signInWithGoogle(onNotificationsTap: (payload, actionId) {});
     } catch (e) {
       setState(() => _errorMessage = 'Pendaftaran Google gagal. Coba lagi');
     } finally {

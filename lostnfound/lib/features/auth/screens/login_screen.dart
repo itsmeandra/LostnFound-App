@@ -47,6 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           .signInWithEmail(
             email: _emailCtrl.text.trim(),
             password: _passwordCtrl.text,
+            onNotificationTap: (payload, actionId) {},
           );
     } on AuthException catch (e) {
       setState(() => _errorMessage = _mapAuthError(e.message));
@@ -64,7 +65,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _errorMessage = null;
     });
     try {
-      await ref.read(authServiceProvider).signInWithGoogle();
+      await ref
+          .read(authServiceProvider)
+          .signInWithGoogle(onNotificationsTap: (payload, actionId) {});
     } catch (e) {
       setState(() => _errorMessage = 'Login Google gagal. Coba lagi');
     } finally {
