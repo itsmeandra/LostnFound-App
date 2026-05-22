@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
@@ -28,6 +31,34 @@ class _ReportFormScreenState extends ConsumerState<ReportFormScreen> {
   String _category = 'other';
   DateTime _itemDate = DateTime.now();
   TimeOfDay _itemTime = TimeOfDay.now();
+
+  // State untuk peta
+  LatLng _currentLocation = const LatLng(
+    -0.02639334884986339,
+    109.34275565105214,
+  );
+
+  // Fungsi Reverse Geocoding
+  Future<void> _getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+
+        String address =
+            '${place.street}, ${place.subLocality}, ${place.locality}';
+
+        address = address.replaceAll(RegExp(r', null|null, |null'), '').trim();
+
+        // Otomatis isi kolom teks lokasi
+        setState(() {
+          _locationCtrl.text = address;
+        });
+      }
+    } catch (e) {
+      debugPrint("Gagal mengambil alamat: $e");
+    }
+  }
 
   final Color _bgColor = const Color(0xFFFAF9FB);
   final Color _greenBadge = const Color(0xFF6CF8BB);
@@ -66,6 +97,8 @@ class _ReportFormScreenState extends ConsumerState<ReportFormScreen> {
           name: _nameCtrl.text,
           category: _category,
           location: _locationCtrl.text,
+          latitude: _currentLocation.latitude,
+          longitude: _currentLocation.longitude,
           description: _descCtrl.text.isNotEmpty ? _descCtrl.text : null,
           distinctiveFeatures: _featCtrl.text.isNotEmpty
               ? _featCtrl.text
@@ -325,6 +358,95 @@ class _ReportFormScreenState extends ConsumerState<ReportFormScreen> {
                           return 'Lokasi wajib diisi';
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 4),
+
+                    //───── Maps ─────
+                    Container(
+                      height: 250,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      clipBehavior: Clip
+                          .hardEdge, // Agar peta tidak bocor keluar sudut melengkung
+                      child: Stack(
+                        children: [
+                          FlutterMap(
+                            options: MapOptions(
+                              initialCenter: _currentLocation,
+                              initialZoom: 16.0,
+                              // Ambil alamat SETELAH peta selesai digeser
+                              onMapEvent: (MapEvent event) {
+                                if (event is MapEventMoveEnd) {
+                                  _getAddressFromLatLng(
+                                    event.camera.center.latitude,
+                                    event.camera.center.longitude,
+                                  );
+                                }
+                              },
+                              // Update koordinat SECARA REALTIME saat digeser
+                              onPositionChanged: (position, hasGesture) {
+                                if (hasGesture && position.center != null) {
+                                  setState(() {
+                                    _currentLocation = position.center!;
+                                  });
+                                }
+                              },
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                userAgentPackageName: 'com.keandy.lostnfound',
+                              ),
+                            ],
+                          ),
+                          // Pin statis di tengah layar
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: 35.0),
+                              child: Icon(
+                                Icons.location_on,
+                                color: Colors.red,
+                                size: 40,
+                              ),
+                            ),
+                          ),
+                          // Label instruksi
+                          Positioned(
+                            bottom: 12,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: const Text(
+                                  'Geser peta untuk menentukan titik',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
