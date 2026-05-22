@@ -79,6 +79,8 @@ class ReportFormNotifier extends StateNotifier<ReportFormState> {
     required String name,
     required String category,
     required String location,
+    required double? latitude,
+    required double? longitude,
     String? description,
     String? distinctiveFeatures,
     required DateTime itemDate,
@@ -101,6 +103,8 @@ class ReportFormNotifier extends StateNotifier<ReportFormState> {
         name: name.trim(),
         category: category,
         location: location.trim(),
+        latitude: latitude,
+        longitude: longitude,
         description: description?.trim().isNotEmpty == true
             ? description!.trim()
             : null,
