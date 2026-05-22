@@ -5,6 +5,8 @@ class ItemModel {
   final String name;
   final String category;
   final String location;
+  final double? latitude;
+  final double? longitude;
   final String? description;
   final String?
   distinctiveFeatures; // Kolom sensitif — hanya ada saat user lihat miliknya
@@ -23,6 +25,8 @@ class ItemModel {
     required this.name,
     required this.category,
     required this.location,
+    this.latitude,
+    this.longitude,
     this.description,
     this.distinctiveFeatures,
     this.photoUrls = const [],
@@ -42,6 +46,8 @@ class ItemModel {
       name: json['name'] as String,
       category: json['category'] as String,
       location: json['location'] as String,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       description: json['description'] as String?,
       distinctiveFeatures: json['distinctive_features'] as String?,
       photoUrls:
@@ -70,6 +76,8 @@ class ItemModel {
       'name': name,
       'category': category,
       'location': location,
+      if (latitude != null) 'latitude': latitude,
+      if (longitude != null) 'longitude': longitude,
       if (description != null) 'description': description,
       if (distinctiveFeatures != null)
         'distinctive_features': distinctiveFeatures,
@@ -90,6 +98,8 @@ class ItemModel {
     String? name,
     String? category,
     String? location,
+    double? latitude,
+    double? longitude,
     String? description,
     String? distinctiveFeatures,
     List<String>? photoUrls,
@@ -104,6 +114,8 @@ class ItemModel {
       name: name ?? this.name,
       category: category ?? this.category,
       location: location ?? this.location,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
       description: description ?? this.description,
       distinctiveFeatures: distinctiveFeatures ?? this.distinctiveFeatures,
       photoUrls: photoUrls ?? this.photoUrls,
