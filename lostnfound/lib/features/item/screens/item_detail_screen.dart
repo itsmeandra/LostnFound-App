@@ -6,6 +6,7 @@ import 'package:lostnfound/core/theme/app_theme.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/claim/widgets/claim_bottom_sheet.dart';
 import 'package:lostnfound/features/item/widgets/storage_image.dart';
+import 'package:lostnfound/features/match/match_section.dart';
 import 'package:lostnfound/features/report/data/item_detail_provider.dart';
 
 class ItemDetailScreen extends ConsumerWidget {
@@ -130,6 +131,12 @@ class ItemDetailScreen extends ConsumerWidget {
                         name: detail.reporterName,
                         date: item.createdAt ?? item.itemDate,
                         isOwner: isOwner,
+                      ),
+                      const SizedBox(height: 20),
+
+                      MatchSection(
+                        itemId: item.id!,
+                        itemType: item.type,
                       ),
                       const SizedBox(height: 20),
 
