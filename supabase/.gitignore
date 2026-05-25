@@ -1,2 +1,3 @@
 .temp/
 /functions/match-items/index.ts
+/functions/send-notification/index.ts
