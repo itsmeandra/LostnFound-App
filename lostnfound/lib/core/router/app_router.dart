@@ -6,6 +6,7 @@ import 'package:lostnfound/core/services/fcm_service.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/auth/screens/login_screen.dart';
 import 'package:lostnfound/features/auth/screens/register_screen.dart';
+import 'package:lostnfound/features/claim/widgets/my_claims_screen.dart';
 import 'package:lostnfound/features/home/home_screen.dart';
 import 'package:lostnfound/features/item/screens/item_detail_screen.dart';
 import 'package:lostnfound/features/notification/notification_screen.dart';
@@ -39,7 +40,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // Belum login, mau ke halaman protected → paksa ke /login
       if (!isLoggedIn && !isAuthPage) return AppConstants.routeLogin;
-      
+
       // Sudah login, masih di halaman login/register → ke /home
       if (isLoggedIn && isAuthPage) return AppConstants.routeHome;
 
@@ -75,6 +76,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/my-reports', builder: (_, __) => const MyReportsScreen()),
+      GoRoute(
+        path: AppConstants.routeMyClaims,
+        builder: (_, __) => const MyClaimsScreen(),
+      ),
       GoRoute(
         path: '/notifications',
         builder: (_, __) => const NotificationScreen(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/profile/avatar_widget.dart';
 import 'package:lostnfound/features/profile/edit_profile_sheet.dart';
@@ -75,10 +76,7 @@ class ProfileScreen extends ConsumerWidget {
                 title: 'Klaim Saya',
                 subtitle: 'Status pengajuan klaim',
                 onTap: () {
-                  // TODO Minggu 3: navigasi ke halaman klaim
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Segera hadir di Minggu 3!')),
-                  );
+                  context.push(AppConstants.routeMyClaims);
                 },
                 showChevron: true,
               ),
