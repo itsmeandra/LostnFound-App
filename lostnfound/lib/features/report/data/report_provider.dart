@@ -141,6 +141,8 @@ class ReportFormNotifier extends StateNotifier<ReportFormState> {
     if (raw.contains('storage')) return 'Gagal upload foto. Coba lagi.';
     if (raw.contains('network')) return 'Tidak ada koneksi internet.';
     if (raw.contains('row-level')) return 'Sesi habis. Silakan login ulang.';
+
+    print('Error Detail: $raw.');
     return 'Terjadi kesalahan. Coba lagi.';
   }
 }
