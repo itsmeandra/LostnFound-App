@@ -21,10 +21,7 @@ final myClaimsProvider = FutureProvider.autoDispose<List<ClaimModel>>((
       .from(AppConstants.tableClaims)
       .select('''
         *,
-        items:item_id (
-          id, name, category, location,
-          photo_urls, status, type
-        )
+        item:item_id (*)
       ''')
       .eq('claimant_id', user.id)
       .order('created_at', ascending: false);
@@ -173,4 +170,34 @@ class ClaimFormNotifier extends StateNotifier<ClaimFormState> {
 final claimFormProvider =
     StateNotifierProvider.autoDispose<ClaimFormNotifier, ClaimFormState>(
       (ref) => ClaimFormNotifier(ref),
+    );
+
+//───── Notifier: Aksi Klaim (Selesaikan Klaim) ─────
+class ClaimActionNotifier extends StateNotifier<AsyncValue<void>> {
+  final Ref _ref;
+  ClaimActionNotifier(this._ref) : super(const AsyncData(null));
+
+  // Ubah menjadi Future<bool> agar UI tahu sukses atau gagal
+  Future<bool> confirmItemReceived(String claimId, String itemId) async {
+    state = const AsyncLoading();
+    try {
+      await supabase.rpc(
+        'complete_claim',
+        params: {'p_claim_id': claimId, 'p_item_id': itemId},
+      );
+
+      _ref.invalidate(myClaimsProvider);
+      state = const AsyncData(null);
+      return true; // Berhasil!
+    } catch (e) {
+      print('ERROR CLAIM: $e'); // Cetak di terminal
+      state = AsyncError(e, StackTrace.current);
+      return false; // Gagal!
+    }
+  }
+}
+
+final claimActionProvider =
+    StateNotifierProvider<ClaimActionNotifier, AsyncValue<void>>(
+      (ref) => ClaimActionNotifier(ref),
     );
