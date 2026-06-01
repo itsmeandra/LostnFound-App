@@ -4,23 +4,27 @@ import '../../report/data/item_model.dart';
 enum ClaimStatus {
   pending,
   approved,
-  rejected;
+  rejected,
+  completed;
 
   String get label => switch (this) {
     ClaimStatus.pending => 'Menunggu Verifikasi',
     ClaimStatus.approved => 'Disetujui',
     ClaimStatus.rejected => 'Ditolak',
+    ClaimStatus.completed => 'Selesai',
   };
 
   Color get color => switch (this) {
     ClaimStatus.pending => const Color(0xFFF57C00),
     ClaimStatus.approved => const Color(0xFF388E3C),
     ClaimStatus.rejected => const Color(0xFFD32F2F),
+    ClaimStatus.completed => const Color(0xFF1976D2),
   };
 
   static ClaimStatus fromString(String s) => switch (s) {
     'approved' => ClaimStatus.approved,
     'rejected' => ClaimStatus.rejected,
+    'completed' => ClaimStatus.completed,
     _ => ClaimStatus.pending,
   };
 }
@@ -52,8 +56,8 @@ class ClaimModel {
 
   factory ClaimModel.fromJson(Map<String, dynamic> json) {
     ItemModel? item;
-    if (json['items'] != null) {
-      item = ItemModel.fromJson(json['items'] as Map<String, dynamic>);
+    if (json['item'] != null) {
+      item = ItemModel.fromJson(json['item'] as Map<String, dynamic>);
     }
     return ClaimModel(
       id: json['id'] as String,
@@ -78,4 +82,5 @@ class ClaimModel {
   bool get isPending => status == ClaimStatus.pending;
   bool get isApproved => status == ClaimStatus.approved;
   bool get isRejected => status == ClaimStatus.rejected;
+  bool get isCompleted => status == ClaimStatus.completed;
 }
