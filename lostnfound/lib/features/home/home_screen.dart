@@ -28,8 +28,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   final Color _bgColor = const Color(0xFFFCFCFC);
   final Color _navyColor = const Color(0xFF141A28);
-  final Color _greenColor = const Color(0xFF6EE7B7);
-  final Color _greyCardColor = const Color(0xFFE5E7EB);
   final Color _lightGrey = const Color(0xFFF3F4F6);
 
   //───── Search dengan debounce 400ms ─────
@@ -158,7 +156,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   itemCount: AppConstants.itemCategories.length + 1,
                   separatorBuilder: (_, __) => const SizedBox(width: 8),
                   itemBuilder: (context, i) {
-                    // Index 0 = "Semua"
                     final isAll = i == 0;
                     final value = isAll
                         ? ''
@@ -200,7 +197,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             //───── Section Label ─────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -231,16 +228,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
 
-            //───── Grid Item ─────
+            //───── List Item (Pengganti Grid Item) ─────
             itemsAsync.when(
-              // Loading: shimmer grid
               loading: () => SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverGrid(
-                  gridDelegate: _gridDelegate,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (_, __) => const _ShimmerCard(),
-                    childCount: 6,
+                    (_, __) => const Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: _ShimmerCard(),
+                    ),
+                    childCount: 3,
                   ),
                 ),
               ),
@@ -267,11 +265,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }
 
                 return SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverGrid(
-                    gridDelegate: _gridDelegate,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
-                      (context, i) => ItemCard(item: items[i]),
+                      (context, i) => Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: ItemCard(item: items[i]),
+                      ),
                       childCount: items.length,
                     ),
                   ),
@@ -285,14 +285,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
-
-SliverGridDelegateWithFixedCrossAxisCount get _gridDelegate =>
-    const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 0.75,
-    );
 
 String _categoryLabel(String cat) {
   return AppConstants.itemCategories.firstWhere(
@@ -308,45 +300,37 @@ class _ShimmerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade200,
-      highlightColor: Colors.grey.shade100,
-      child: Card(
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade200,
+        highlightColor: Colors.grey.shade100,
         child: Column(
           children: [
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                color: Colors.grey.shade200,
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 12,
-                      width: double.infinity,
-                      color: Colors.grey.shade200,
+            Container(height: 180, width: double.infinity, color: Colors.white),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(height: 20, width: 200, color: Colors.white),
+                  const SizedBox(height: 12),
+                  Container(height: 14, width: 150, color: Colors.white),
+                  const SizedBox(height: 16),
+                  Container(
+                    height: 50,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 6),
-                    Container(
-                      height: 10,
-                      width: 80,
-                      color: Colors.grey.shade200,
-                    ),
-                    const Spacer(),
-                    Container(
-                      height: 16,
-                      width: 60,
-                      color: Colors.grey.shade200,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
