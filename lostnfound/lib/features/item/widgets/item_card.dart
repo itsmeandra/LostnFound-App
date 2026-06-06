@@ -44,6 +44,7 @@ class ItemCard extends StatelessWidget {
                     Text(
                       item.name,
                       style: theme.textTheme.labelLarge?.copyWith(
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                         height: 1.2,
                       ),
@@ -55,9 +56,11 @@ class ItemCard extends StatelessWidget {
                     // Lokasi
                     Row(
                       children: [
-                        Icon(Icons.location_on_outlined,
-                            size: 11,
-                            color: theme.colorScheme.onSurfaceVariant),
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 11,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                         const SizedBox(width: 2),
                         Expanded(
                           child: Text(
@@ -72,7 +75,8 @@ class ItemCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Spacer(),
+                    // const Spacer(),
+                    const SizedBox(height: 3),
 
                     // Status badge + tanggal
                     Row(
@@ -81,7 +85,9 @@ class ItemCard extends StatelessWidget {
                         // Status
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: statusColor.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(4),
@@ -147,8 +153,11 @@ class _PhotoArea extends StatelessWidget {
       errorWidget: (_, __, ___) => Container(
         color: Colors.grey.shade100,
         child: const Center(
-          child: Icon(Icons.broken_image_outlined,
-              size: 28, color: Colors.grey),
+          child: Icon(
+            Icons.broken_image_outlined,
+            size: 28,
+            color: Colors.grey,
+          ),
         ),
       ),
     );
@@ -176,7 +185,9 @@ class _NoPhotoPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.4),
+      color: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withOpacity(0.4),
       child: Center(
         child: Text(
           _categoryIcons[category] ?? '📦',
