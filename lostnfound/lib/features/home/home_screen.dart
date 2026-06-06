@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
+import 'package:lostnfound/features/home/widgets/notification_badge.dart';
 import 'package:lostnfound/features/item/widgets/item_card.dart';
 import 'package:lostnfound/features/report/data/items_provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -24,6 +25,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _debounce?.cancel();
     super.dispose();
   }
+
+  final Color _bgColor = const Color(0xFFFCFCFC);
+  final Color _navyColor = const Color(0xFF141A28);
+  final Color _greenColor = const Color(0xFF6EE7B7);
+  final Color _greyCardColor = const Color(0xFFE5E7EB);
+  final Color _lightGrey = const Color(0xFFF3F4F6);
 
   //───── Search dengan debounce 400ms ─────
   // Cegah query ke Supabase setiap ketukan — tunggu user berhenti mengetik.
@@ -59,69 +66,83 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lost n Found'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {}, // Diimplementasikan Minggu 3
+        backgroundColor: _bgColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        // leading: IconButton(
+        //   icon: const Icon(Icons.menu, color: Colors.black87),
+        //   onPressed: () {},
+        // ),
+        title: const Text(
+          'Lost n Found',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
           ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authServiceProvider).signOut();
-              // GoRouter otomatis redirect ke /login
-            },
-          ),
-        ],
+        ),
+        centerTitle: false,
+        actions: [const NotificationBadge()],
       ),
       body: RefreshIndicator(
         onRefresh: _onRefresh,
         child: CustomScrollView(
           slivers: [
-            //───── Search Bar ─────
+            //───── Greeting ─────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: SearchBar(
-                  controller: _searchCtrl,
-                  hintText: 'Cari barang hilang / temuan...',
-                  leading: const Icon(Icons.search, size: 20),
-                  padding: const WidgetStatePropertyAll(
-                    EdgeInsets.symmetric(horizontal: 14),
-                  ),
-                  elevation: const WidgetStatePropertyAll(0),
-                  backgroundColor: WidgetStatePropertyAll(
-                    theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-                  ),
-                  onChanged: _onSearchChanged,
-                  trailing: [
-                    if (_searchCtrl.text.isNotEmpty)
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 18),
-                        onPressed: () {
-                          _searchCtrl.clear();
-                          _onSearchChanged('');
-                        },
+                padding: const EdgeInsets.fromLTRB(20, 8, 10, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Halo, $userName',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Periksa laporan yang sedang aktif atau cari item.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
 
-            //───── Greeting ─────
+            //───── Search Bar ─────
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                child: RichText(
-                  text: TextSpan(
-                    style: theme.textTheme.titleMedium,
-                    children: [
-                      const TextSpan(text: 'Halo, '),
-                      TextSpan(
-                        text: '$userName! 👋',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextField(
+                  controller: _searchCtrl,
+                  onChanged: _onSearchChanged,
+                  decoration: InputDecoration(
+                    hintText: 'Cari barang milik anda...',
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 14,
+                    ),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
+                    filled: true,
+                    fillColor: _lightGrey,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: _navyColor),
+                    ),
                   ),
                 ),
               ),
@@ -142,15 +163,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     final value = isAll
                         ? ''
                         : AppConstants.itemCategories[i - 1]['value']!;
-                    final label = isAll
-                        ? ''
+
+                    final labelText = isAll
+                        ? 'Semua'
                         : AppConstants.itemCategories[i - 1]['label']!;
+
                     final selected = filter.category == value;
+
                     return FilterChip(
-                      label: Text(label),
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(labelText),
+                          if (selected && !isAll) ...[
+                            const SizedBox(width: 6),
+                            const Icon(Icons.close, size: 16),
+                          ],
+                        ],
+                      ),
                       selected: selected,
                       showCheckmark: false,
-                      onSelected: (_) => _onCategoryChanged(value),
+
+                      onSelected: (_) {
+                        if (selected && !isAll) {
+                          _onCategoryChanged('');
+                        } else {
+                          _onCategoryChanged(value);
+                        }
+                      },
                     );
                   },
                 ),
@@ -169,7 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ? 'Hasil pencarian "${filter.query}"'
                           : filter.category.isNotEmpty
                           ? _categoryLabel(filter.category)
-                          : 'Barang Temuan Terbaru',
+                          : 'Baru Ditemukan',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
