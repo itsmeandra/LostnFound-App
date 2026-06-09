@@ -83,10 +83,12 @@ class PhotoUploadService {
       //
       // Alternatif jika bucket public:
       // return supabase.storage.from(AppConstants.itemPhotosBucket).getPublicUrl(storagePath);
+      final expiresIn = 60 * 60 * 24 * 30; // 1 bulan
 
       final signedUrl = await supabase.storage
           .from(AppConstants.itemPhotosBucket)
-          .createSignedUrl(storagePath, 60 * 60); // 1 jam
+          // .createSignedUrl(storagePath, 60 * 60); // 1 jam
+          .createSignedUrl(storagePath, expiresIn);
 
       return signedUrl;
     } catch (e) {
