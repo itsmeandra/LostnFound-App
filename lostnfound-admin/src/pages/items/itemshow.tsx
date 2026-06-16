@@ -36,8 +36,12 @@ const categoryLabels: Record<string, string> = {
 };
 
 export const ItemShow = () => {
-  const [rejectModal, setRejectModal] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
+  const [approveOpen, setApproveOpen] = useState(false);
+  const [rejectOpen, setRejectOpen] = useState(false);
+  const [completeOpen, setCompleteOpen] = useState(false);
+
+  const [approveForm] = Form.useForm();
+  const [rejectForm] = Form.useForm();
 
   const { query } = useShow({
     resource: "items", meta: {
@@ -49,28 +53,42 @@ export const ItemShow = () => {
   const { mutate: updateItem, mutation } = useUpdate();
   const isLoading = mutation.isPending
 
-  const handleApprove = () => {
-    updateItem({
-      resource: "items",
-      id: record.id,
-      values: { status: "published" },
-      successNotification: {
-        message: "Laporan disetujui dan dipublikasi!",
-        type: "success",
-      },
-    });
+  const handleApprove = async () => {
+    try {
+      const { drop_point, storage_location } = await approveForm.validateFields();
+      updateItem({
+        resource: "items",
+        id: record.id,
+        values: {
+          status: "published",
+          drop_point: drop_point || null,
+          storage_location: storage_location || null,
+        },
+        successNotification: {
+          message: "Laporan disetujui dan dipublikasi!",
+          type: "success",
+        },
+      });
+      setApproveOpen(false);
+      approveForm.resetFields();
+    } catch (_) { }
   };
 
-  const handleReject = () => {
-    updateItem({
-      resource: "items",
-      id: record.id,
-      values: {
-        status: "rejected",
-        reject_reason: rejectReason.trim() || "Laporan tidak memenuhi ketentuan."
-      },
-      successNotification: { message: "Laporan ditolak.", type: "error" },
-    });
+  const handleReject = async () => {
+    try {
+      const { reason } = await rejectForm.validateFields();
+      updateItem({
+        resource: "items",
+        id: record.id,
+        values: {
+          status: "rejected",
+          reject_reason: reason,
+        },
+        successNotification: { message: "Laporan ditolak.", type: "error" },
+      });
+      setRejectOpen(false);
+      rejectForm.resetFields();
+    } catch (_) { }
   }
 
   const handleComplete = () => {
@@ -96,7 +114,21 @@ export const ItemShow = () => {
         <Space>
           {record.status === "pending" && (
             <>
-              <Popconfirm
+              <Button
+                type="primary"
+                icon={<CheckCircleOutlined />}
+                onClick={() => setApproveOpen(true)}
+              >
+                Setuju
+              </Button>
+              <Button
+                danger
+                icon={<CloseCircleOutlined />}
+                onClick={() => setRejectOpen(true)}
+              >
+                Tolak
+              </Button>
+              {/* <Popconfirm
                 title="Setujui & publikasikan laporan ini?"
                 onConfirm={handleApprove}
                 okText="Setujui"
@@ -109,27 +141,33 @@ export const ItemShow = () => {
                 >
                   Setujui
                 </Button>
-              </Popconfirm>
-              <Button
+              </Popconfirm> */}
+              {/* <Button
                 danger
                 icon={<CloseCircleOutlined />}
                 onClick={() => setRejectModal(true)}
               >
                 Tolak
-              </Button>
+              </Button> */}
             </>
           )}
           {record.status === "claimed" && (
-            <Popconfirm
-              title="Tandai barang sebagai sudah dikembalikan ke pemilik?"
-              onConfirm={handleComplete}
-              okText="Ya, selesai"
-              cancelText="Batal"
+            <Button
+              icon={<TrophyOutlined />}
+              onClick={() => setCompleteOpen(true)}
             >
-              <Button icon={<TrophyOutlined />} loading={isLoading}>
-                Selesai / Dikembalikan
-              </Button>
-            </Popconfirm>
+              Selesai / Dikembalikan
+            </Button>
+            // <Popconfirm
+            //   title="Tandai barang sebagai sudah dikembalikan ke pemilik?"
+            //   onConfirm={handleComplete}
+            //   okText="Ya, selesai"
+            //   cancelText="Batal"
+            // >
+            //   <Button icon={<TrophyOutlined />} loading={isLoading}>
+            //     Selesai / Dikembalikan
+            //   </Button>
+            // </Popconfirm>
           )}
         </Space>
       }
@@ -196,6 +234,18 @@ export const ItemShow = () => {
 
         <Descriptions.Item label="Lokasi" span={2}>
           {record.location}
+
+          {record.drop_point && (
+            <Descriptions.Item label="Lokasi Penitipan (Publik)" span={2}>
+              <Text style={{ color: "#1565C0", fontWeight: 500 }}>{record.drop_point}</Text>
+            </Descriptions.Item>
+          )}
+
+          {record.storage_location && (
+            <Descriptions.Item label="Rak/Laci Internal (Admin)" span={2}>
+              <Text type="secondary">{record.storage_location}</Text>
+            </Descriptions.Item>
+          )}
         </Descriptions.Item>
 
         <Descriptions.Item label="Tanggal Kejadian">
@@ -245,7 +295,18 @@ export const ItemShow = () => {
           {reporter.email ?? "—"}
         </Descriptions.Item>
         <Descriptions.Item label="No. HP">
-          {reporter.phone ?? "—"}
+          {reporter.phone ? (
+            <Space>
+              <a href={`tel:${reporter.phone}`}>{reporter.phone}</a>
+              <Button
+                size="small"
+                href={`https://wa.me/${reporter.phone.replace(/\D/g, "")}`}
+                target="_blank"
+              >
+                WhatsApp
+              </Button>
+            </Space>
+          ) : "—"}
         </Descriptions.Item>
         <Descriptions.Item label="ID Pelapor">
           <Text copyable code style={{ fontSize: 11 }}>
@@ -254,26 +315,65 @@ export const ItemShow = () => {
         </Descriptions.Item>
       </Descriptions>
 
-      {/* Modal reject */}
+      {/* Modal Approve */}
+      <Modal
+        title="Setujui Laporan & Isi Lokasi"
+        open={approveOpen}
+        onOk={handleApprove}
+        onCancel={() => { setApproveOpen(false); approveForm.resetFields(); }}
+        okText="Publikasikan"
+        cancelText="Batal"
+        okButtonProps={{ loading: isLoading }}
+      >
+        <Form form={approveForm} layout="vertical">
+          <Form.Item
+            name="drop_point"
+            label="Lokasi Pengambilan (Publik)"
+            rules={[{ required: true, message: "Lokasi wajib diisi" }]}
+          >
+            <Input placeholder="Contoh: Administrasi Kampus" />
+          </Form.Item>
+          <Form.Item name="storage_location" label="Lokasi Internal (Opsional)">
+            <Input placeholder="Contoh: Laci B3" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Modal Reject */}
       <Modal
         title="Tolak Laporan"
-        open={rejectModal}
+        open={rejectOpen}
         onOk={handleReject}
-        onCancel={() => setRejectModal(false)}
-        okText="Tolak Laporan"
-        okButtonProps={{ danger: true }}
+        onCancel={() => { setRejectOpen(false); rejectForm.resetFields(); }}
+        okText="Tolak"
+        okButtonProps={{ danger: true, loading: isLoading }}
         cancelText="Batal"
       >
-        <Form layout="vertical">
-          <Form.Item label="Alasan Penolakan">
+        <Form form={rejectForm} layout="vertical">
+          <Form.Item
+            name="reason"
+            label="Alasan Penolakan"
+            rules={[{ required: true }, { min: 10, message: "Terlalu singkat" }]}
+          >
             <Input.TextArea
               rows={3}
-              placeholder="Contoh: Foto tidak jelas, laporan duplikat, konten tidak sesuai..."
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Alasan penolakan..."
             />
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* Modal Selesai */}
+      <Modal
+        title="Tandai Barang Selesai?"
+        open={completeOpen}
+        onOk={handleComplete}
+        onCancel={() => setCompleteOpen(false)}
+        okText="Ya, Selesai"
+        cancelText="Batal"
+        okButtonProps={{ loading: isLoading }}
+      >
+        <p>Konfirmasi bahwa barang fisik sudah diserahkan kepada pemilik aslinya.</p>
       </Modal>
     </Show>
   );
