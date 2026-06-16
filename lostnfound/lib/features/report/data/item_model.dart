@@ -15,6 +15,7 @@ class ItemModel {
   status; // 'pending' | 'published' | 'claimed' | 'completed' | 'rejected'
   final String? rejectionReason;
   final DateTime itemDate;
+  final String? dropPoint;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -33,6 +34,7 @@ class ItemModel {
     this.status = 'pending',
     this.rejectionReason,
     required this.itemDate,
+    this.dropPoint,
     this.createdAt,
     this.updatedAt,
   });
@@ -58,6 +60,7 @@ class ItemModel {
       status: json['status'] as String? ?? 'pending',
       rejectionReason: json['rejection_reason'] as String?,
       itemDate: DateTime.parse(json['item_date'] as String),
+      dropPoint: json['drop_point'] as String?,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,
