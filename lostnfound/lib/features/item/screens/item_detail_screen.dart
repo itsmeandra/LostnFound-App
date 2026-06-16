@@ -104,6 +104,60 @@ class ItemDetailScreen extends ConsumerWidget {
                       _InfoGrid(detail: detail),
                       const SizedBox(height: 20),
 
+                      if (item.dropPoint != null &&
+                          item.dropPoint!.isNotEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.blue.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade100,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.storefront_outlined,
+                                  color: Colors.blue.shade800,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Titik Penitipan Barang',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.blue.shade800,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      item.dropPoint!,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.blue.shade900,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.3,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
                       // Divider
                       const Divider(),
                       const SizedBox(height: 12),
@@ -134,10 +188,7 @@ class ItemDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 20),
 
-                      MatchSection(
-                        itemId: item.id!,
-                        itemType: item.type,
-                      ),
+                      MatchSection(itemId: item.id!, itemType: item.type),
                       const SizedBox(height: 20),
 
                       // Pesan jika item milik sendiri
