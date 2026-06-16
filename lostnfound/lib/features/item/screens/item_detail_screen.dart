@@ -8,6 +8,7 @@ import 'package:lostnfound/features/claim/widgets/claim_bottom_sheet.dart';
 import 'package:lostnfound/features/item/widgets/storage_image.dart';
 import 'package:lostnfound/features/match/match_section.dart';
 import 'package:lostnfound/features/report/data/item_detail_provider.dart';
+import '../widgets/drop_point_card.dart';
 
 class ItemDetailScreen extends ConsumerWidget {
   final String itemId;
@@ -104,57 +105,13 @@ class ItemDetailScreen extends ConsumerWidget {
                       _InfoGrid(detail: detail),
                       const SizedBox(height: 20),
 
-                      if (item.dropPoint != null &&
-                          item.dropPoint!.isNotEmpty) ...[
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.blue.shade200),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.shade100,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.storefront_outlined,
-                                  color: Colors.blue.shade800,
-                                  size: 24,
-                                ),
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Titik Penitipan Barang',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.blue.shade800,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      item.dropPoint!,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.blue.shade900,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.3,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                      if (DropPointCard.shouldShow(
+                        item.dropPoint,
+                        item.status,
+                      )) ...[
+                        DropPointCard(
+                          dropPoint: item.dropPoint!,
+                          itemStatus: item.status,
                         ),
                       ],
 
