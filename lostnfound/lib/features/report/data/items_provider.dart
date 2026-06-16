@@ -97,9 +97,9 @@ Future<List<ItemModel>> _fetchItems(ItemsFilter filter) async {
   final offset = filter.page * AppConstants.itemsPerPage;
 
   var query = supabase
-      .from('items_public')
+      .from(AppConstants.tableItems)
       .select()
-      .eq('type', 'found'); // Hanya tampilkan barang TEMUAN di feed utama
+      .eq('status', 'published');
   // .order('created_at', ascending: false)
   // .range(offset, offset + AppConstants.itemsPerPage - 1);
 
