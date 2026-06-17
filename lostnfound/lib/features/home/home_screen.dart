@@ -167,19 +167,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                     final selected = filter.category == value;
 
-                    return FilterChip(
-                      label: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(labelText),
-                          if (selected && !isAll) ...[
-                            const SizedBox(width: 6),
-                            const Icon(Icons.close, size: 16),
-                          ],
-                        ],
-                      ),
+                    return InputChip(
+                      label: Text(labelText),
                       selected: selected,
                       showCheckmark: false,
+
+                      side: BorderSide(
+                        color: selected
+                            ? theme.colorScheme.primary
+                            : Colors.grey.shade300,
+                      ),
 
                       onSelected: (_) {
                         if (selected && !isAll) {
@@ -188,6 +185,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           _onCategoryChanged(value);
                         }
                       },
+
+                      onDeleted: (selected && !isAll)
+                          ? () => _onCategoryChanged('')
+                          : null,
+
+                      deleteIcon: const Icon(Icons.close, size: 16),
+                      deleteIconColor: theme.colorScheme.onPrimaryContainer,
                     );
                   },
                 ),
