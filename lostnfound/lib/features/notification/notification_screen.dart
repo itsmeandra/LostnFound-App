@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -178,6 +179,14 @@ class NotificationScreen extends ConsumerWidget {
             itemBuilder: (context, i) => _NotificationTile(
               notif: notifs[i],
               onTap: () => _handleTap(context, notifs[i]),
+              onDismiss: () async {
+                if (!notifs[i].isRead) {
+                  await supabase
+                      .from(AppConstants.tableNotifications)
+                      .update({'is_read': true})
+                      .eq('id', notifs[i].id);
+                }
+              },
             ),
           );
         },
@@ -217,96 +226,139 @@ class NotificationScreen extends ConsumerWidget {
 class _NotificationTile extends StatelessWidget {
   final NotificationModel notif;
   final VoidCallback onTap;
+  final VoidCallback onDismiss;
 
-  const _NotificationTile({required this.notif, required this.onTap});
+  const _NotificationTile({
+    required this.notif,
+    required this.onTap,
+    required this.onDismiss,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final showFullBody = [
+      'claim_approved',
+      'item_published',
+    ].contains(notif.type);
 
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        color: notif.isRead
-            ? null
-            : theme.colorScheme.primaryContainer.withOpacity(0.08),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Dismissible(
+      key: Key(notif.id),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => onDismiss(),
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        color: Colors.green.shade100,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            // Ikon tipe notifikasi
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: notif.iconColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(notif.icon, color: notif.iconColor, size: 22),
+            Text(
+              'Tandai dibaca',
+              style: TextStyle(color: Colors.green.shade700, fontSize: 12),
             ),
-            const SizedBox(width: 12),
-
-            // Konten
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          notif.title,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: notif.isRead
-                                ? FontWeight.normal
-                                : FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      if (!notif.isRead)
-                        Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.only(left: 6, top: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    notif.body,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      height: 1.4,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _formatTime(notif.createdAt),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(
-                        0.6,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Chevron jika punya target navigasi
-            if (notif.targetRoute != null)
-              Icon(
-                Icons.chevron_right,
-                size: 18,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+            const SizedBox(width: 6),
+            Icon(Icons.done_all, color: Colors.green.shade700, size: 18),
           ],
+        ),
+      ),
+      child: InkWell(
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: Container(
+          color: notif.isRead
+              ? null
+              : theme.colorScheme.primaryContainer.withOpacity(0.08),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Ikon tipe notifikasi
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: notif.iconColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(notif.icon, color: notif.iconColor, size: 22),
+              ),
+              const SizedBox(width: 12),
+
+              // Konten
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            notif.title,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: notif.isRead
+                                  ? FontWeight.normal
+                                  : FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (!notif.isRead)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(left: 6, top: 2),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      notif.body,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
+                      maxLines: showFullBody ? null : 2,
+                      overflow: showFullBody
+                          ? TextOverflow.clip
+                          : TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text(
+                          _formatTime(notif.createdAt),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withOpacity(0.6),
+                          ),
+                        ),
+
+                        // Chevron jika punya target navigasi
+                        if (notif.targetRoute != null) ...[
+                          const SizedBox(width: 10),
+                          Text(
+                            'Lihat →',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
