@@ -1,31 +1,42 @@
 import { Refine, Authenticated } from "@refinedev/core";
-import { App as AntdApp } from "antd";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { App as AntdApp } from "antd";
 import {
-  useNotificationProvider,
   ThemedLayout,
+  ThemedSider,
+  ThemedTitle,
   ErrorComponent,
+  useNotificationProvider,
 } from "@refinedev/antd";
 import "@refinedev/antd/dist/reset.css";
-import { dataProvider, liveProvider } from "@refinedev/supabase";
+
+import { BrowserRouter, Route, Routes, Outlet } from "react-router-dom";
 import routerBindings, {
   DocumentTitleHandler,
   NavigateToResource,
   UnsavedChangesNotifier,
   CatchAllNavigate,
 } from "@refinedev/react-router";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { dataProvider, liveProvider } from "@refinedev/supabase";
 
 import { supabaseClient } from "./providers/supabase-client";
 import { authProvider } from "./providers/auth";
 
-// Pages — dibuat minimal untuk Hari 4
-// Detail implementasi di Minggu 2 & 3
-import { ClaimList, ClaimShow } from "./pages/claims/";
-import { ItemList, ItemShow, ItemEdit } from "./pages/items";
+import {
+  DashboardOutlined,
+  FileSearchOutlined,
+  CheckCircleOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import "dayjs/locale/id";
+
 import { LoginPage } from "./pages/auth/login";
 import { DashboardPage } from "./pages/dashboard";
+import { ItemList, ItemShow, ItemEdit } from "./pages/items";
+import { ClaimList, ClaimShow } from "./pages/claims";
 import { ProfileList } from "./pages/profiles";
+dayjs.locale("id");
 
 export default function App() {
   return (
@@ -35,24 +46,22 @@ export default function App() {
           <Refine
             dataProvider={dataProvider(supabaseClient)}
             liveProvider={liveProvider(supabaseClient)}
-            options={{ liveMode: "auto" }}
-
-            // ── Auth Provider ──
             authProvider={authProvider}
-
-            // ── Router ──
             routerProvider={routerBindings}
-
-            // ── Notifikasi UI ──
             notificationProvider={useNotificationProvider}
-
-            // ── Resources ──
-            // Resource = tabel di Supabase yang diekspos ke admin
+            options={{
+              liveMode: "auto",
+              syncWithLocation: true,
+              warnWhenUnsavedChanges: true,
+            }}
             resources={[
               {
                 name: "dashboard",
                 list: "/",
-                meta: { label: "Dashboard", icon: "📊" },
+                meta: {
+                  label: "Dashboard",
+                  icon: <DashboardOutlined />,
+                },
               },
               {
                 name: "items",
@@ -61,23 +70,25 @@ export default function App() {
                 edit: "/items/edit/:id",
                 meta: {
                   label: "Laporan",
-                  icon: "📋",
+                  icon: <FileSearchOutlined />,
+                  canDelete: true,
                 },
               },
               {
                 name: "claims",
                 list: "/claims",
                 show: "/claims/show/:id",
-                meta: { label: "Klaim", icon: "🔖" },
+                meta: {
+                  label: "Klaim",
+                  icon: <CheckCircleOutlined />,
+                },
               },
               {
                 name: "profiles",
                 list: "/profiles",
-                show: "/profiles/show/:id",
                 meta: {
                   label: "Pengguna",
-                  icon: "👤",
-                  select: "id, full_name, email, phone, role, created_at, avatar_url",
+                  icon: <TeamOutlined />,
                 },
               },
             ]}
@@ -89,7 +100,18 @@ export default function App() {
                     key="authenticated-inner"
                     fallback={<CatchAllNavigate to="/login" />}
                   >
-                    <ThemedLayout>
+                    <ThemedLayout
+                      Sider={() => (
+                        <ThemedSider
+                          Title={({ collapsed }: { collapsed: boolean }) => (
+                            <ThemedTitle
+                              collapsed={collapsed}
+                              text="Lost n Found"
+                            />
+                          )}
+                        />
+                      )}
+                    >
                       <Outlet />
                     </ThemedLayout>
                   </Authenticated>
@@ -101,7 +123,6 @@ export default function App() {
                   <Route path="show/:id" element={<ItemShow />} />
                   <Route path="edit/:id" element={<ItemEdit />} />
                 </Route>
-                {/* Route claims & profiles ditambahkan Minggu 2-3 */}
                 <Route path="/claims">
                   <Route index element={<ClaimList />} />
                   <Route path="show/:id" element={<ClaimShow />} />
