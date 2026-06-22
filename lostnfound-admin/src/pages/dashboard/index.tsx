@@ -158,16 +158,15 @@ const StatCards = () => {
   );
 };
 
-// ────────── Bar Chart — laporan per minggu (7 minggu terakhir) ──────────
+// ────────── Bar Chart — laporan 7 Hari terakhir ──────────
 const WeeklyChart = () => {
-  // Ambil semua item 7 minggu terakhir
-  const sevenWeeksAgo = dayjs().subtract(7, "week").toISOString();
+  const sevenDaysAgo = dayjs().subtract(6, "day").startOf("day").toISOString();
 
   const { query } = useList({
     resource: "items",
     liveMode: "off",
     meta: { select: "created_at, type, status" },
-    filters: [{ field: "created_at", operator: "gte", value: sevenWeeksAgo }],
+    filters: [{ field: "created_at", operator: "gte", value: sevenDaysAgo }],
     pagination: { pageSize: 500 },
   });
 
@@ -175,25 +174,24 @@ const WeeklyChart = () => {
 
   if (isLoading) return <Spin size="small" />;
 
-  // Group by week
-  const weeks: Record<string, { found: number; lost: number }> = {};
+  const days: Record<string, { found: number; lost: number }> = {};
+
   for (let i = 6; i >= 0; i--) {
-    const label = dayjs().subtract(i, "week").format("D MMM");
-    weeks[label] = { found: 0, lost: 0 };
+    const label = dayjs().subtract(i, "day").format("DD MMM");
+    days[label] = { found: 0, lost: 0 };
   }
 
   data?.data?.forEach((item: any) => {
-    const weekLabel = dayjs(item.created_at)
-      .startOf("week")
-      .format("D MMM");
-    if (weeks[weekLabel]) {
-      if (item.type === "found") weeks[weekLabel].found++;
-      else weeks[weekLabel].lost++;
+    const dayLabel = dayjs(item.created_at).format("DD MMM");
+
+    if (days[dayLabel]) {
+      if (item.type === "found") days[dayLabel].found++;
+      else days[dayLabel].lost++;
     }
   });
 
-  const chartData = Object.entries(weeks).map(([week, counts]) => ({
-    week,
+  const chartData = Object.entries(days).map(([day, counts]) => ({
+    day,
     Temuan: counts.found,
     Hilang: counts.lost,
   }));
@@ -201,7 +199,7 @@ const WeeklyChart = () => {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={chartData} barGap={2}>
-        <XAxis dataKey="week" tick={{ fontSize: 10 }} />
+        <XAxis dataKey="day" tick={{ fontSize: 10 }} />
         <YAxis tick={{ fontSize: 10 }} width={24} allowDecimals={false} />
         <RTooltip />
         <Bar dataKey="Temuan" fill="#34A853" radius={[3, 3, 0, 0]} maxBarSize={24} />
@@ -520,7 +518,7 @@ export const DashboardPage = () => {
         <Col xs={24} md={14}>
           <Card
             size="small"
-            title="Laporan per Minggu (7 Minggu Terakhir)"
+            title="Laporan 7 Hari Terakhir"
             extra={
               <Space size={12}>
                 <Space size={4}>
