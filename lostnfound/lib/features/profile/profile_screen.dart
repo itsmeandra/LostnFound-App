@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:lostnfound/features/auth/provider/auth_provider.dart';
 import 'package:lostnfound/features/profile/avatar_widget.dart';
 import 'package:lostnfound/features/profile/edit_profile_sheet.dart';
 import 'package:lostnfound/features/profile/profile_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+const _surfaceColor = Colors.white;
+const _primaryDeepBlue = Color(0xFF131B2E);
+const _borderLight = Color(0xFFE2E8F0);
+const _textSecondary = Color(0xFF45464D);
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -15,14 +20,25 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(profileProvider);
     final updateState = ref.watch(profileNotifierProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: _surfaceColor,
       appBar: AppBar(
-        title: const Text('Profil Saya'),
-        // Tidak ada back button — ini tab root
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
         automaticallyImplyLeading: false,
+        title: Text(
+          'Profil Saya',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: _primaryDeepBlue,
+          ),
+        ),
       ),
+
       body: profileAsync.when(
         loading: () => const _ProfileSkeleton(),
         error: (e, _) =>
@@ -33,98 +49,90 @@ class ProfileScreen extends ConsumerWidget {
           }
 
           return ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 32),
             children: [
-              //───── Header: Avatar + Nama + Email ─────
               _ProfileHeader(
                 profile: profile,
                 isUploading: updateState.isLoading,
                 onAvatarTap: () => _showAvatarOptions(context, ref, profile),
-                onEditTap: () => showEditProfileSheet(context, profile),
               ),
+              const SizedBox(height: 40),
 
-              const SizedBox(height: 8),
-              const Divider(height: 1),
-
-              //───── Section: Akun ─────
-              _SectionHeader('Akun'),
-              _SettingsTile(
-                icon: Icons.edit_outlined,
-                title: 'Edit Profil',
-                subtitle: 'Ubah nama dan nomor telepon',
-                onTap: () => showEditProfileSheet(context, profile),
-              ),
-              _SettingsTile(
-                icon: Icons.lock_outline,
-                title: 'Ubah Password',
-                subtitle: 'Kirim email reset password',
-                onTap: () => _handleResetPassword(context, ref, profile.email),
-              ),
-
-              const Divider(height: 1),
-
-              //───── Section: Aktivitas ─────
-              _SectionHeader('Aktivitas'),
-              _SettingsTile(
-                icon: Icons.list_alt_outlined,
-                title: 'Laporan Saya',
-                subtitle: 'Lihat semua laporan yang pernah dibuat',
-                onTap: () => context.go('/track'),
-                showChevron: true,
-              ),
-              _SettingsTile(
-                icon: Icons.handshake_outlined,
-                title: 'Klaim Saya',
-                subtitle: 'Status pengajuan klaim',
-                onTap: () {
-                  context.push(AppConstants.routeMyClaims);
-                },
-                showChevron: true,
-              ),
-
-              const Divider(height: 1),
-
-              //───── Section: Aplikasi ─────
-              _SectionHeader('Aplikasi'),
-              _SettingsTile(
-                icon: Icons.info_outline,
-                title: 'Tentang Aplikasi',
-                subtitle: 'Versi 1.0.0 • Lost & Found App',
-                onTap: () => _showAboutDialog(context),
-              ),
-              _SettingsTile(
-                icon: Icons.privacy_tip_outlined,
-                title: 'Kebijakan Privasi',
-                onTap: () async {
-                  // Ganti dengan URL kebijakan privasi yang sesungguhnya
-                  final uri = Uri.parse('https://example.com/privacy');
-                  if (await canLaunchUrl(uri)) launchUrl(uri);
-                },
-              ),
-
-              const Divider(height: 1),
-              const SizedBox(height: 8),
-
-              //───── Tombol Logout ─────
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                child: OutlinedButton.icon(
-                  onPressed: () => _handleLogout(context, ref),
-                  icon: const Icon(Icons.logout, color: Colors.red),
-                  label: const Text(
-                    'Keluar',
-                    style: TextStyle(color: Colors.red),
+              const _SectionHeader('Akun'),
+              _SettingsGroup(
+                children: [
+                  _SettingsTile(
+                    icon: Icons.person_outline,
+                    title: 'Edit Profil',
+                    subtitle: 'Ubah nama dan nomor telepon',
+                    onTap: () => showEditProfileSheet(context, profile),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.red),
-                    minimumSize: const Size(double.infinity, 48),
-                  ),
-                ),
+                ],
               ),
-
               const SizedBox(height: 24),
+
+              const _SectionHeader('Aktivitas'),
+              _SettingsGroup(
+                children: [
+                  _SettingsTile(
+                    icon: Icons.description_outlined,
+                    title: 'Laporan Saya',
+                    subtitle: 'Lihat semua laporan yang pernah dibuat',
+                    onTap: () => context.go('/my-reports'),
+                  ),
+                  _SettingsTile(
+                    icon: Icons.handshake_outlined,
+                    title: 'Klaim Saya',
+                    subtitle: 'Status pengajuan klaim',
+                    onTap: () => context.push(AppConstants.routeMyClaims),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              const _SectionHeader('Aplikasi'),
+              _SettingsGroup(
+                children: [
+                  _SettingsTile(
+                    icon: Icons.help_outline,
+                    title: 'Tentang Aplikasi',
+                    subtitle: 'Versi 1.0.0 • Lost n Found App',
+                    onTap: () => _showAboutDialog(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              OutlinedButton.icon(
+                onPressed: () => _handleLogout(context, ref),
+                icon: const Icon(
+                  Icons.logout,
+                  color: Color(0xFFDC2626),
+                  size: 20,
+                ),
+                label: Text(
+                  'Logout',
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFFDC2626),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: const Color(
+                    0xFFFEF2F2,
+                  ),
+                  side: BorderSide(
+                    color: Colors.red.shade200,
+                  ), // Garis tepi merah
+                  minimumSize: const Size(double.infinity, 52),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+              const SizedBox(height: 40),
             ],
           );
         },
@@ -132,7 +140,6 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  //───── Opsi ganti/hapus avatar ─────
   void _showAvatarOptions(
     BuildContext context,
     WidgetRef ref,
@@ -140,118 +147,232 @@ class ProfileScreen extends ConsumerWidget {
   ) {
     showModalBottomSheet<void>(
       context: context,
+      backgroundColor: Colors.white,
       builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Ganti Foto Profil'),
-              onTap: () {
-                Navigator.pop(context);
-                ref.read(profileNotifierProvider.notifier).updateAvatar();
-              },
-            ),
-            if (profile.avatarUrl != null)
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text(
-                  'Hapus Foto Profil',
-                  style: TextStyle(color: Colors.red),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 48,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
                 ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined),
+                title: const Text('Ganti Foto Profil'),
                 onTap: () {
                   Navigator.pop(context);
-                  ref.read(profileNotifierProvider.notifier).removeAvatar();
+                  ref.read(profileNotifierProvider.notifier).updateAvatar();
                 },
               ),
-            const SizedBox(height: 8),
-          ],
+              if (profile.avatarUrl != null)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  title: const Text(
+                    'Hapus Foto Profil',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ref.read(profileNotifierProvider.notifier).removeAvatar();
+                  },
+                ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  //───── Reset password via email ─────
-  Future<void> _handleResetPassword(
-    BuildContext context,
-    WidgetRef ref,
-    String? email,
-  ) async {
-    if (email == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Email tidak tersedia.')));
-      return;
-    }
-
-    try {
-      await ref.read(authServiceProvider).resetPassword(email);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Email reset password dikirim ke $email. Cek inbox kamu.',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Gagal mengirim email reset. Coba lagi.'),
-          ),
-        );
-      }
-    }
-  }
-
-  //───── Logout dengan konfirmasi ─────
   Future<void> _handleLogout(BuildContext context, WidgetRef ref) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Keluar dari aplikasi?'),
-        content: const Text(
-          'Kamu akan keluar dari akunmu. Untuk mengakses laporan, '
-          'kamu perlu login kembali.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Batal'),
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFEF2F2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.warning_outlined,
+                    size: 32,
+                    color: Color(0xFFDC2626),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                Text(
+                  'Keluar dari aplikasi?',
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                Text(
+                  'Kamu akan keluar dari akunmu. Untuk mengakses laporan, kamu perlu login kembali.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade300),
+                          minimumSize: const Size(0, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Batal',
+                          style: GoogleFonts.inter(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(
+                            0xFFDC2626,
+                          ), // Merah solid
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(0, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Keluar',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Keluar'),
-          ),
-        ],
-      ),
+        );
+      },
     );
 
     if (confirmed == true && context.mounted) {
       await ref.read(authServiceProvider).signOut();
-      // GoRouter redirect otomatis ke /login setelah signOut
     }
   }
 
-  //───── About dialog ─────
   void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
+    showModalBottomSheet<void>(
       context: context,
-      applicationName: 'Lost n Found',
-      applicationVersion: '1.0.0',
-      applicationLegalese: '© 2026 Team Lost n Found',
-      children: [
-        const SizedBox(height: 12),
-        const Text(
-          'Platform pelaporan dan pencarian barang hilang/temuan '
-          'di lingkungan kampus dan sekitarnya.',
-        ),
-      ],
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 48,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+
+                Text(
+                  'Lost n Found',
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                Text(
+                  'Versi 1.0.0',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Text(
+                  'Platform pelaporan dan pencarian barang hilang/temuan '
+                  'di lingkungan kampus dan sekitarnya.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                Text(
+                  '© 2026 Team Lost n Found. All rights reserved.',
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: Colors.grey.shade400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -260,42 +381,48 @@ class _ProfileHeader extends StatelessWidget {
   final ProfileModel profile;
   final bool isUploading;
   final VoidCallback onAvatarTap;
-  final VoidCallback onEditTap;
 
   const _ProfileHeader({
     required this.profile,
     required this.isUploading,
     required this.onAvatarTap,
-    required this.onEditTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+    return Center(
       child: Column(
         children: [
-          // Avatar
           Stack(
             alignment: Alignment.center,
             children: [
-              AvatarWidget(
-                avatarUrl: profile.avatarUrl,
-                displayName: profile.fullName,
-                radius: 48,
-                onTap: isUploading ? null : onAvatarTap,
-                showEditBadge: !isUploading,
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: AvatarWidget(
+                  avatarUrl: profile.avatarUrl,
+                  displayName: profile.fullName,
+                  radius: 56, // Diperbesar sesuai desain
+                  onTap: isUploading ? null : onAvatarTap,
+                  showEditBadge: false,
+                ),
               ),
               if (isUploading)
-                Positioned.fill(
+                const Positioned.fill(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Colors.black38,
                       shape: BoxShape.circle,
                     ),
-                    child: const Center(
+                    child: Center(
                       child: CircularProgressIndicator(
                         color: Colors.white,
                         strokeWidth: 2,
@@ -305,72 +432,25 @@ class _ProfileHeader extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 20),
 
-          // Nama
+          // Name
           Text(
             profile.fullName.isEmpty ? 'Nama belum diatur' : profile.fullName,
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
+            style: GoogleFonts.manrope(
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              color: _primaryDeepBlue,
             ),
           ),
+          const SizedBox(height: 4),
 
           // Email
-          if (profile.email != null) ...[
-            const SizedBox(height: 4),
+          if (profile.email != null)
             Text(
               profile.email!,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              style: GoogleFonts.inter(fontSize: 14, color: _textSecondary),
             ),
-          ],
-
-          // Role badge (admin saja)
-          if (profile.role == 'admin') ...[
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.shield_outlined,
-                    size: 14,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Administrator',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 14),
-
-          // Tombol edit
-          OutlinedButton.icon(
-            onPressed: onEditTap,
-            icon: const Icon(Icons.edit_outlined, size: 16),
-            label: const Text('Edit Profil'),
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(160, 36),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -384,14 +464,48 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-          fontWeight: FontWeight.w500,
-          letterSpacing: .5,
+        style: GoogleFonts.manrope(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: _primaryDeepBlue,
         ),
+      ),
+    );
+  }
+}
+
+class _SettingsGroup extends StatelessWidget {
+  final List<Widget> children;
+
+  const _SettingsGroup({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _borderLight),
+      ),
+      child: Column(
+        children: children.asMap().entries.map((entry) {
+          final isLast = entry.key == children.length - 1;
+          return Column(
+            children: [
+              entry.value,
+              if (!isLast)
+                Divider(
+                  height: 1,
+                  color: _borderLight,
+                  indent: 16,
+                  endIndent: 16,
+                ),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -400,113 +514,55 @@ class _SectionHeader extends StatelessWidget {
 class _SettingsTile extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String? subtitle;
+  final String subtitle;
   final VoidCallback onTap;
-  final bool showChevron;
 
   const _SettingsTile({
     required this.icon,
     required this.title,
-    this.subtitle,
+    required this.subtitle,
     required this.onTap,
-    this.showChevron = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return ListTile(
-      leading: Icon(icon, size: 22, color: theme.colorScheme.onSurfaceVariant),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      leading: Icon(icon, size: 24, color: _primaryDeepBlue),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        style: GoogleFonts.inter(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: _primaryDeepBlue,
+        ),
       ),
-      subtitle: subtitle != null
-          ? Text(
-              subtitle!,
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            )
-          : null,
-      trailing: showChevron
-          ? Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant)
-          : null,
-      onTap: onTap,
-      dense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Text(
+          subtitle,
+          style: GoogleFonts.inter(fontSize: 12, color: _textSecondary),
+        ),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right,
+        color: Color(0xFFC6C6CD),
+        size: 20,
+      ),
     );
   }
 }
 
-//───── Loading skeleton ─────
 class _ProfileSkeleton extends StatelessWidget {
   const _ProfileSkeleton();
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        // Header skeleton
-        Center(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
-            child: Column(
-              children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Container(width: 140, height: 16, color: Colors.grey.shade200),
-                const SizedBox(height: 8),
-                Container(width: 200, height: 12, color: Colors.grey.shade200),
-              ],
-            ),
-          ),
-        ),
-        // Tile skeletons
-        ...List.generate(
-          5,
-          (_) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              children: [
-                Container(width: 24, height: 24, color: Colors.grey.shade200),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 13,
-                        color: Colors.grey.shade200,
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        width: 180,
-                        height: 11,
-                        color: Colors.grey.shade200,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+    return const Center(child: CircularProgressIndicator());
   }
 }
 
-//───── Error view ─────
 class _ErrorView extends StatelessWidget {
   final VoidCallback onRetry;
   const _ErrorView({required this.onRetry});
