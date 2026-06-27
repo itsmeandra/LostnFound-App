@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
 
-  // Mapping index tab ke route path
   static const List<String> _routes = [
-    '/home', // AppConstants.routeHome, // index 0 - Beranda
-    '/laporan', 
-    '/track', // index 1 - Lacak (ditambahkan minggu 2)
-    '/profile', // AppConstants.routeProfile, // index 2 - Profil
+    '/home',
+    '/laporan',
+    '/track',
+    '/profile',
   ];
 
   @override
   Widget build(BuildContext context) {
-    // Tentukan index aktif berdasarkan route saat ini
     final currentPath = GoRouterState.of(context).matchedLocation;
     int currentIndex = 0;
     for (int i = 0; i < _routes.length; i++) {
@@ -25,6 +24,9 @@ class MainShell extends StatelessWidget {
         break;
       }
     }
+
+    const primaryDeepBlue = Color(0xFF131B2E);
+    const textSecondary = Color(0xFF76777D);
 
     return PopScope(
       canPop: false,
@@ -35,43 +37,89 @@ class MainShell extends StatelessWidget {
         }
       },
       child: Scaffold(
-        body: child, // Konten halaman aktif dari GoRouter
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: currentIndex,
-          onDestinationSelected: (index) {
-            if (index != currentIndex) {
-              context.go(_routes[index]);
-            }
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Beranda',
+        backgroundColor: const Color(0xFFFCF8FA),
+        body: child,
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              backgroundColor: Colors.white,
+              indicatorColor: Colors.transparent,
+              elevation: 0,
+              height: 72,
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
+
+              labelTextStyle: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: primaryDeepBlue,
+                  );
+                }
+                return GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: textSecondary,
+                );
+              }),
+
+              iconTheme: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return const IconThemeData(color: primaryDeepBlue, size: 26);
+                }
+                return const IconThemeData(color: textSecondary, size: 24);
+              }),
             ),
-            NavigationDestination(
-              icon: Icon(Icons.add_circle_outline),
-              selectedIcon: Icon(Icons.add_circle_outlined),
-              label: 'Laporan',
+            child: NavigationBar(
+              selectedIndex: currentIndex,
+              onDestinationSelected: (index) {
+                if (index != currentIndex) {
+                  context.go(_routes[index]);
+                }
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: 'Beranda',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.add_circle_outline),
+                  selectedIcon: Icon(Icons.add_circle),
+                  label: 'Laporan',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.track_changes_outlined),
+                  selectedIcon: Icon(Icons.track_changes),
+                  label: 'Lacak',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person_outline),
+                  selectedIcon: Icon(Icons.person),
+                  label: 'Profil',
+                ),
+              ],
             ),
-            NavigationDestination(
-              icon: Icon(Icons.track_changes_outlined),
-              selectedIcon: Icon(Icons.track_changes),
-              label: 'Lacak',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Profil',
-            ),
-          ],
+          ),
         ),
-        // FAB "Lapor Hilang" hanya muncul di tab Beranda (index 0)
+
+        // ── Floating Action Button (Hanya muncul di tab Beranda) ──
         floatingActionButton: currentIndex == 0
             ? FloatingActionButton(
                 onPressed: () => context.push(AppConstants.routeReport),
-                backgroundColor: Colors.black,
+                backgroundColor: primaryDeepBlue,
                 foregroundColor: Colors.white,
+                elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
