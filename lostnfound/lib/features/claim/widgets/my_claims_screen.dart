@@ -11,7 +11,6 @@ class MyClaimsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final claimsAsync = ref.watch(myClaimsProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9FB),
@@ -239,7 +238,6 @@ class _ClaimCard extends ConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      // 👇 PERBARUI BAGIAN ONPRESSED INI 👇
                       onPressed: actionState.isLoading
                           ? null
                           : () async {
@@ -275,7 +273,6 @@ class _ClaimCard extends ConsumerWidget {
                               }
                             },
 
-                      // 👆 SAMPAI DI SINI 👆
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade600,
                         foregroundColor: Colors.white,
