@@ -43,8 +43,10 @@ class NotificationModel {
     final itemId = data['item_id'] as String?;
     return switch (type) {
       'item_published' => itemId != null ? '/item/$itemId' : null,
-      'claim_approved' => '/track',
-      'claim_rejected' => '/track',
+      'item_rejected' => '/my-reports',
+      'item_returned' => '/my-reports',
+      'claim_approved' => '/my-claims',
+      'claim_rejected' => '/my-claims',
       'match_found' => itemId != null ? '/item/$itemId' : null,
       _ => null,
     };
@@ -53,6 +55,8 @@ class NotificationModel {
   // Ikon per tipe notifikasi
   IconData get icon => switch (type) {
     'item_published' => Icons.check_circle_outline,
+    'item_rejected' => Icons.error_outline,
+    'item_returned' => Icons.verified_outlined,
     'claim_approved' => Icons.handshake_outlined,
     'claim_rejected' => Icons.cancel_outlined,
     'match_found' => Icons.search_outlined,
@@ -61,6 +65,8 @@ class NotificationModel {
 
   Color get iconColor => switch (type) {
     'item_published' => const Color(0xFF388E3C),
+    'item_rejected' => const Color(0xFFD32F2F),
+    'item_returned' => const Color(0xFF1976D2),
     'claim_approved' => const Color(0xFF1565C0),
     'claim_rejected' => const Color(0xFFD32F2F),
     'match_found' => const Color(0xFFF57C00),
