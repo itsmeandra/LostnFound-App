@@ -13,6 +13,7 @@ class AppTheme {
   static const Color statusClaimed = Color(0xFF1565C0); // Biru tua
   static const Color statusCompleted = Color(0xFF757575); // Abu-abu
   static const Color statusRejected = Color(0xFFD32F2F); // Merah
+  static const Color statusReturned = Color(0xFF232F72); // Merah
 
   // ── Light Theme ──
   static ThemeData get lightTheme => ThemeData(
@@ -63,6 +64,7 @@ class AppTheme {
       'claimed' => statusClaimed,
       'completed' => statusCompleted,
       'rejected' => statusRejected,
+      'returned' => statusReturned,
       _ => Colors.grey,
     };
   }
@@ -74,6 +76,7 @@ class AppTheme {
       'claimed' => 'Sedang Diklaim',
       'completed' => 'Selesai',
       'rejected' => 'Ditolak',
+      'returned' => 'Dikembalikan',
       _ => status,
     };
   }
