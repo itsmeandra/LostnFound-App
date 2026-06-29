@@ -78,7 +78,7 @@ class ProfileScreen extends ConsumerWidget {
                     icon: Icons.description_outlined,
                     title: 'Laporan Saya',
                     subtitle: 'Lihat semua laporan yang pernah dibuat',
-                    onTap: () => context.go('/my-reports'),
+                    onTap: () => context.push(AppConstants.routeMyReports),
                   ),
                   _SettingsTile(
                     icon: Icons.handshake_outlined,
@@ -119,9 +119,7 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  backgroundColor: const Color(
-                    0xFFFEF2F2,
-                  ),
+                  backgroundColor: const Color(0xFFFEF2F2),
                   side: BorderSide(
                     color: Colors.red.shade200,
                   ), // Garis tepi merah
