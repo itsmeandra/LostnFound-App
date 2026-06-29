@@ -41,21 +41,24 @@ class ClaimBottomSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final existingAsync = ref.watch(existingClaimProvider(itemId));
 
-    return existingAsync.when(
-      // Saat mengecek klaim existing: tampilkan loading minimal
-      loading: () => const SizedBox(
-        height: 160,
-        child: Center(child: CircularProgressIndicator()),
+    return Container(
+      color: Colors.white,
+      child: existingAsync.when(
+        // Saat mengecek klaim existing: tampilkan loading minimal
+        loading: () => const SizedBox(
+          height: 160,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+        error: (_, __) => _ClaimForm(itemId: itemId, itemName: itemName),
+        data: (existingClaim) {
+          // Sudah pernah klaim → tampilkan status, bukan form
+          if (existingClaim != null) {
+            return _ExistingClaimView(claim: existingClaim, itemName: itemName);
+          }
+          // Belum pernah klaim → tampilkan form
+          return _ClaimForm(itemId: itemId, itemName: itemName);
+        },
       ),
-      error: (_, __) => _ClaimForm(itemId: itemId, itemName: itemName),
-      data: (existingClaim) {
-        // Sudah pernah klaim → tampilkan status, bukan form
-        if (existingClaim != null) {
-          return _ExistingClaimView(claim: existingClaim, itemName: itemName);
-        }
-        // Belum pernah klaim → tampilkan form
-        return _ClaimForm(itemId: itemId, itemName: itemName);
-      },
     );
   }
 }
@@ -269,7 +272,7 @@ class _ClaimFormState extends ConsumerState<_ClaimForm> {
               ),
               Text(
                 widget.itemName,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -334,7 +337,7 @@ class _ClaimFormState extends ConsumerState<_ClaimForm> {
               ElevatedButton(
                 onPressed: state.isLoading ? null : _handleSubmit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
+                  backgroundColor: Color(0xFF141A28),
                   foregroundColor: Colors.white,
                 ),
                 child: state.isLoading
