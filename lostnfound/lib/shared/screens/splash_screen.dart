@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lostnfound/core/constants/app_constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -28,7 +29,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _checkSession() async {
-    await Future.delayed(const Duration(milliseconds: 1200));
+    await Future.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
 
     final session = Supabase.instance.client.auth.currentSession;
@@ -41,33 +42,87 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: FadeTransition(
         opacity: _fade,
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/logo.png', width: 88, height: 88),
-              const SizedBox(height: 20),
-              Text(
-                'Lost n Found',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
+        child: SafeArea(
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    width: 100,
+                    height: 100,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Temukan dan Laporkan barang yang hilang',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                const SizedBox(height: 24),
+                Text(
+                  'Lost n Found',
+                  style: GoogleFonts.inter(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF131B2E),
+                    letterSpacing: -0.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 48),
-              const CircularProgressIndicator(),
-            ],
+                const Spacer(),
+                Text(
+                  'Menyatukan Anda kembali dengan hal-hal yang penting',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF76777D),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const _LoadingDots(),
+                const SizedBox(height: 48),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LoadingDots extends StatelessWidget {
+  const _LoadingDots();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildDot(),
+        const SizedBox(width: 6),
+        _buildDot(),
+        const SizedBox(width: 6),
+        _buildDot(),
+      ],
+    );
+  }
+
+  Widget _buildDot() {
+    return Container(
+      width: 6,
+      height: 6,
+      decoration: const BoxDecoration(
+        color: Color(0xFFC6C6CD),
+        shape: BoxShape.circle,
       ),
     );
   }
