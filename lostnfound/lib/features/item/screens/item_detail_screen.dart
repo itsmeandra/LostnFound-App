@@ -20,6 +20,7 @@ class ItemDetailScreen extends ConsumerWidget {
     final currentUser = ref.watch(currentUserProvider);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: detailAsync.when(
         loading: () => const _LoadingSkeleton(),
         error: (e, _) =>
@@ -27,8 +28,6 @@ class ItemDetailScreen extends ConsumerWidget {
         data: (detail) {
           final item = detail.item;
           final isOwner = currentUser?.id == item.reporterId;
-          final canClaim =
-              item.status == 'published' && !isOwner && currentUser != null;
 
           return CustomScrollView(
             slivers: [
@@ -226,7 +225,7 @@ class ItemDetailScreen extends ConsumerWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
+                  backgroundColor: Color(0xFF141A28),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 52),
                   shape: RoundedRectangleBorder(
@@ -254,7 +253,7 @@ class _StatusChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: color.withOpacity(0.4)),
       ),
       child: Text(
@@ -280,7 +279,7 @@ class _TypeChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
