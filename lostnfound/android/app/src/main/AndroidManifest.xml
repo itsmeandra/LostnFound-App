@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
     android:maxSdkVersion="32"/> <!-- Android < 13 -->
     <application
-        android:label="lostnfound"
+        android:label="Lost n Found"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
