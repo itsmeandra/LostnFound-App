@@ -35,6 +35,7 @@ class _MyReportsScreenState extends ConsumerState<MyReportsScreen>
     final reportsAsync = ref.watch(myReportsProvider);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Laporan Saya'),
         // Tab filter: Semua / Hilang / Temuan
@@ -150,6 +151,7 @@ class _ReportTile extends StatelessWidget {
     final statusColor = AppTheme.statusColor(item.status);
     final statusLabel = AppTheme.statusLabel(item.status);
     final theme = Theme.of(context);
+    final hasPhoto = item.photoUrls.isNotEmpty;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
@@ -160,19 +162,29 @@ class _ReportTile extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              //───── Ikon kategori ─────
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  width: 50,
+                  height: 50,
                   color: statusColor.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    _categoryEmoji(item.category),
-                    style: const TextStyle(fontSize: 22),
-                  ),
+                  child: hasPhoto
+                      ? Image.network(
+                          item.photoUrls.first,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Text(
+                              _categoryEmoji(item.category),
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            _categoryEmoji(item.category),
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(width: 14),
