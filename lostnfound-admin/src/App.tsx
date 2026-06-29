@@ -137,7 +137,16 @@ export default function App() {
 
             <RefineKbar />
             <UnsavedChangesNotifier />
-            <DocumentTitleHandler />
+            <DocumentTitleHandler
+              handler={({ resource }) => {
+                const pageName = resource?.meta?.label ?? resource?.name;
+                const appName = "Lost n Found";
+                if (pageName) {
+                  return `${pageName} | ${appName}`;
+                }
+                return appName;
+              }}
+            />
           </Refine>
         </AntdApp>
       </RefineKbarProvider>
