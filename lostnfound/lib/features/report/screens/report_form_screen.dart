@@ -59,7 +59,7 @@ class _ReportFormScreenState extends ConsumerState<ReportFormScreen> {
     }
   }
 
-  final Color _bgColor = const Color(0xFFFAF9FB);
+  final Color _bgColor = Colors.white;
   final Color _greenBadge = const Color(0xFF6CF8BB);
 
   @override
@@ -182,7 +182,14 @@ class _ReportFormScreenState extends ConsumerState<ReportFormScreen> {
           elevation: 0,
           scrolledUnderElevation: 0,
 
-          title: const Text('Lost n Found'),
+          title: Text(
+            'Lost n Found',
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+            ),
+          ),
           leading: BackButton(onPressed: () => context.pop()),
           actions: [
             // Tombol submit di AppBar (alternatif dari tombol bawah)
