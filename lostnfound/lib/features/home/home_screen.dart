@@ -63,6 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .first;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: _bgColor,
         elevation: 0,
